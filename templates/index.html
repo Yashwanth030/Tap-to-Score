@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click the Target Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div id="game-container">
+        <div id="target"></div>
+        <div id="score-board">
+            <span id="score">Score: 0</span>
+        </div>
+        <div id="timer">Time: 30</div>
+        <div id="game-over" class="hidden">Game Over! Final Score: <span id="final-score">0</span></div>
+    </div>
+    <script>
+        let score = 0;
+        let timeLeft = 30;
+        let gameInterval;
+        let timerInterval;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const target = document.getElementById('target');
+            const scoreBoard = document.getElementById('score');
+            const timer = document.getElementById('timer');
+            const gameOverMessage = document.getElementById('game-over');
+            const finalScore = document.getElementById('final-score');
+
+            function moveTarget() {
+                const gameContainer = document.getElementById('game-container');
+                const maxX = gameContainer.clientWidth - target.clientWidth;
+                const maxY = gameContainer.clientHeight - target.clientHeight;
+
+                const randomX = Math.floor(Math.random() * maxX);
+                const randomY = Math.floor(Math.random() * maxY);
+
+                target.style.left = `${randomX}px`;
+                target.style.top = `${randomY}px`;
+            }
+
+            function startGame() {
+                gameInterval = setInterval(moveTarget, 1000);
+                timerInterval = setInterval(updateTimer, 1000);
+            }
+
+            function updateTimer() {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    timer.textContent = `Time: ${timeLeft}`;
+                } else {
+                    stopGame();
+                }
+            }
+
+            function stopGame() {
+                clearInterval(gameInterval);
+                clearInterval(timerInterval);
+                target.style.display = 'none';
+                gameOverMessage.classList.remove('hidden');
+                finalScore.textContent = score;
+                submitScore(score);
+            }
+
+            function submitScore(score) {
+                fetch('/submit_score', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ score: score }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            }
+
+            target.addEventListener('click', () => {
+                if (timeLeft > 0) {
+                    score++;
+                    scoreBoard.textContent = `Score: ${score}`;
+                    moveTarget();
+                }
+            });
+
+            startGame();
+        });
+    </script>
+</body>
+</html>
