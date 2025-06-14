@@ -7,13 +7,11 @@ tap_to_score/
 ├── templates/
 │   └── index.html
 ├── static/
-│   └── style.css  (optional)
+│   └── style.css 
 ├── README.md
 
  ## Features
 - Tap-based scoring system
-
-- Score submission using AJAX
 
 - Scores stored in a MySQL database
 
@@ -23,7 +21,8 @@ tap_to_score/
 
 1. Clone the Repository
 cd tap-to-score
-2. Install Python Packages
+
+3. Install Python Packages
 Make sure you have Flask and MySQL connector installed:
 
 pip install flask mysql-connector-python
